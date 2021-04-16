@@ -1,0 +1,57 @@
+;########################################## SUBRUTINA DE UN SEGUNDO DE TIEMPO ###################################################################################################################
+;############################	
+BIN2BCD_RS3	BANCO0
+        			CLRF     	BCDH
+        			CLRF     	BCDL
+
+        			movlw    	0x08
+        			movwf    	CUENTA
+
+CONVERSION1
+        			bcf     		 STATUS,C
+        			rlf      		BIN,f
+        			rlf      		BCDL,f
+        			decfsz   		CUENTA,f
+        			goto     		$+2
+        			goto     		FIN_CONV
+        			movlw    	b'00001111'
+        			andwf    		BCDL,w
+        			movwf    	BCD_TEMP
+        			movlw    	0x05
+       				subwf    		BCD_TEMP,w
+        			btfsc    		STATUS,C
+        			call     		sum3nib_bajo
+        			movlw    	b'11110000'
+        			andwf    		BCDL,w
+        			movwf    	BCD_TEMP
+       				movlw    	0x50
+        			subwf   		 BCD_TEMP,w
+        			btfsc    		STATUS,C
+        			call     		sum3nib_alto
+			        goto     		CONVERSION1
+FIN_CONV
+				RETURN
+				
+				;*******************************
+				;Subrutina que se encarga de
+				;sumar 3 al nibble bajo de BCDL
+				;*******************************
+sum3nib_bajo
+				movlw 		0x03
+				addwf 		BCDL,f
+				btfss 		STATUS,C
+				return
+				rlf 			BCDH,f
+				RETURN
+				
+				;*******************************
+				;Subrutina que se encarga de
+				;sumar 3 al nibble alto de BCDL
+				;*******************************
+sum3nib_alto
+				movlw 		0x30
+				addwf 		BCDL,f
+				btfss 		STATUS,C
+				return
+				rlf 			BCDH,f
+				RETURN

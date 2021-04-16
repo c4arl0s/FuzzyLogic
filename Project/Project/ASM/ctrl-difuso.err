@@ -1,0 +1,34 @@
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 107 : Symbol not previously defined (LEE_TEMP_ACTUAL)
+Error[108]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 109 : Illegal character (,)
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 110 : Symbol not previously defined (ERROR_DE_TEMP1)
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 116 : Symbol not previously defined (ALFA)
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 117 : Symbol not previously defined (ALFA_A_ENVIAR)
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 122 : Symbol not previously defined (BTFSC)
+Message[305] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 127 : Using default destination of 1 (file).
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 130 : Symbol not previously defined (CALC_dT_dt)
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 240 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 241 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 243 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 244 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 245 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 268 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 269 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 271 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 272 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 273 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 289 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 290 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 292 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 293 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 294 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[305] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 435 : Using default destination of 1 (file).
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 461 : Symbol not previously defined (BIN_BCD)
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 466 : Symbol not previously defined (TEMP_ACTUAL1)
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 467 : Symbol not previously defined (TEMP_OBJETIVO)
+Error[113]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 470 : Symbol not previously defined (ERROR_TEMPi)
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 519 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 520 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 527 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 530 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 536 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Error[116]   D:\MIS DOCUMENTOS\ASM\CTRL_DIFUSO.ASM 589 : Address label duplicated or different in second pass (LEER_TEMP_ACTUAL)

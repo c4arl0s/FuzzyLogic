@@ -1,0 +1,1048 @@
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;***************************************************************
+                      00002         ; PROGRAMA CONTROL DIFUSO DE TEMPERATURA
+                      00003 
+                      00004         ;title  "PIC Sample code: PIC16F88 program"
+                      00005         ;subtitle       "CARLOS SANTIAGO CRUZ - TESIS - prueba del convertidor analógico digital"
+                      00006 
+                      00007 ;       codigo para el 16f88 a 4 MHz
+                      00008 ;***************************************************************
+                      00009         list    p=16F88
+                      00010         #include        <p16F88.inc>
+                      00001         LIST
+                      00002 ; P16F88.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
+                      00401         LIST
+                      00011         
+                      00012 ;       __CONFIG        _CONFIG1 & _CP_OFF & _CCP1_RB0 & _DEBUG_OFF & _CPD_OFF & _LVP_OFF & _BODEN_OFF &
+                             _MCLR_ON & _PWRTE_ON & _WDT_OFF & _INTRC_IO
+                      00013         ERRORLEVEL -302
+                      00014 
+                      00015 ;***************************************************************
+                      00016 
+  00000020            00017 z1                              equ     20h             ;REGISTROS COMODINES
+  00000021            00018 z2                              equ     21h
+  00000022            00019 z3                              equ     22h
+  00000023            00020 z4                              equ     23h
+  00000024            00021 UNI                             equ     24h
+  00000025            00022 DECE                    equ     25h
+  00000026            00023 SP                              equ     26h
+  00000027            00024 uni_comodin             equ     27h
+  00000028            00025 dece_comodin    equ     28h
+  00000029            00026 STATUS_TEMP     equ 29h
+  0000002A            00027 PCLATH_TEMP     equ 2Ah
+  0000002B            00028 W_TEMP          equ     2Bh
+  0000002C            00029 BINARIO                 equ     2Ch
+  0000002D            00030 CONTADOR1       equ 2Dh
+  0000002E            00031 CONTADOR2       equ 2Eh
+  0000002F            00032 CONTADOR3       equ 2Fh
+                      00033 
+                      00034 
+                      00035 ;***************************************************************
+                      00036 ; registros 
+                      00037 ;       ADRESH  1Eh             banco 0
+                      00038 ;       ADRESL  9Eh             banco 1
+                      00039 ;       ANSEL           9Bh             banco 1
+                      00040 ;       ADCON0  1Fh             banco 0
+                      00041 ;       ADCON1  9Fh             banco 1
+                      00042 ;****************************************************************
+                      00043 
+                      00044 ;#######################################################################################################
+                            ############################
+0000                  00045                                                         ORG             0x0000
+0000   2805           00046                                                         GOTO            INICIO
+                      00047         
+0004                  00048                                                         ORG             0x04
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0004   281D           00049                                                         GOTO            SP_INTERRUPT
+                      00050 
+0005                  00051                                                         ORG             0x05
+                      00052 ;#######################################################################################################
+                            ############################
+                      00053 
+0005   0185           00054 INICIO                                          CLRF            PORTA                                   
+                                            ; limpia puerto A
+0006   0186           00055                                                         CLRF            PORTB                           
+                                                    ; limpia puerto B
+0007   1683           00056                                                         BSF             STATUS,RP0                      
+                                            ; selecciona Banco 1; Se encuentran registros TRISA y TRISB
+                      00057                                                                                                         
+                                                                    ; al reset STATUS=00000000
+                      00058                                                                                                         
+                                                                    ; REGISTRO STATUS =     IRP             RP1             
+                      00059                                                                                                         
+                                                                    ;  RP1 RP0
+                      00060                                                                                                         
+                                                                    ;  0            0               banco 0
+                      00061                                                                                                         
+                                                                    ;  0            1               banco 1         RP0=1
+                      00062                                                                                                         
+                                                                    ;  1            0               banco 2
+                      00063                                                                                                         
+                                                                    ;  1            1               banco 3
+                      00064 
+                      00065 
+                      00066 
+0008   170F           00067                                                         BSF             OSCCON,6                        
+                                                    ;Pone el oscilador a 4 MHz con el oscilador interno RC; OSCCON controla 
+0009   168F           00068                                                         BSF             OSCCON,5                        
+                                                    ;bit 6-4                110             4 MHZ
+                      00069                                                                                                         
+                                                                    ;al reset inicia con 0's el registro.
+                      00070 
+000A   3007           00071                                                         MOVLW           H'07'                           
+                                                    ;carga el registro W con 07             0000 0111
+000B   009C           00072                                                         MOVWF           CMCON                           
+                                                    ;CMCON ->       C2OUT   C1OUT   C2INV   C1INV   CIS      CM2  CM1  CM0
+                      00073                                                                                                         
+                                                                    ; ver los modos de operacion de los comparadores
+                      00074                                                                                                         
+                                                                    ; comparadores apagados
+                      00075                                                                                                         
+                                                                    ;CLRF           TRISA                   ;Puerto A como s
+                      00076 
+                      00077 ;##### CONFIGURA LOS PUERTOS  A y B, (A0,A1,A2,A3 = ENTRADAS)  (A4,A5,A6,A7=SALIDAS),  (B0,B1,B2,B3 = EN
+                            TRADAS)  (B4,B5,B6,B7=SALIDAS) ##################
+                      00078 
+000C   300F           00079                                                         MOVLW           H'0F'
+000D   0085           00080                                                         MOVWF           TRISA           
+                      00081                                                                                                         
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                                                                    ;Puerto B como salida           0 - salida; 1 - entrada
+000E   300F           00082                                                         MOVLW           H'0F'
+000F   0086           00083                                                         MOVWF           TRISB
+                      00084 
+                      00085                                                         ;BCF            STATUS,RP0                      
+                                            ;Selecciona Banco 0
+                      00086 
+                      00087 ;############################### CONFIGURAR FLANCO DE SUBIDA PARA INTERRUPCION EXTERNA POR PIN RB0 #####
+                            ##########################
+0010   1683           00088                                                         BSF             STATUS,RP0                      
+                                            ; selecciona banco 1
+0011   1303           00089                                                         BCF             STATUS,RP1                      
+                                            ; selecciona banco 1
+0012   1701           00090                                                         BSF             OPTION_REG,6                    
+                                                    ; activa por flanco de bajada
+                      00091 
+                      00092 ;######################### HABILITACION DE INTERRUPCIONES ##############################################
+                            #############################
+                      00093                                                         
+0013   178B           00094                                                         BSF             INTCON, GIE                     
+                                                    ; habilitamos todas las interrupciones
+0014   160B           00095                                                         BSF             INTCON, INTE                    
+                                                    ; que sean interrupciones externas
+                      00096 
+                      00097 
+                      00098 ;########################################## CONFIGURANDO EL CONVERTIDOR A/D ############################
+                            ##############################
+                      00099 
+                      00100                                                                                                         
+                                            ;1.     Configure el modulo A/D
+                      00101                                                                                                         
+                                            ;               •       Configurar E/S analógica/digital        (ANSEL) BANCO 1 
+0015   1683           00102                                                         BSF             STATUS,RP0              ; selecc
+                            iona banco 1
+0016   300F           00103                                                         MOVLW           H'0F'
+0017   009B           00104                                                         MOVWF           ANSEL                           
+                            ; Registro ANSEL - ANS6 ANS5 ANS4 ANS3 ANS2 ANS1 ANS0 
+                      00105                                                                                                         
+                                            ; Configura la funcion de los pines de los puertos
+                      00106                                                                                                         
+                                            ; pueden ser configurados como entradas analògicas 
+                      00107                                                                                                         
+                                            ; (RA3,RA2 tambien pueden ser tensiones de referencia)
+                      00108                                                                                                         
+                                            ; o como entradas/salidas digitales; 
+                      00109                                                                                                         
+                                            ;       1 - analog I/O; 
+                      00110                                                                                                         
+                                            ;       0 - digital I/O
+                      00111                                                                                                         
+                                            ; 
+0018   3000           00112                                                         MOVLW                   H'00'                   
+                                                            ;               
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0019   009F           00113                                                         MOVWF                   ADCON1          ;       
+                                    •       Configurar tensión de referencia.       (ADCON1)        BANCO 1
+                      00114                                                                                                         
+                                            ; ADCON1:       ADFM    ADCS2   VCFG1           VCFG0   -       -       -       
+                      00115                                                                                                         
+                                            ; Bit 7 ADFM: selección de bit de resultado de formato A/D
+                      00116                                                                                                         
+                                            ;                               1=justificación derecha: los seis bits mas signi
+                      00117                                                                                                         
+                                            ;                               0=justificación izquierda: los seis bits menos s
+                      00118                                                                                                         
+                                            ; Bit 6 ADSC2: bit de selección de división de reloj por 2 del A/D
+                      00119                                                                                                         
+                                            ;                               1=fuente de reloj es dividida por 2 cuando el si
+                      00120                                                                                                         
+                                            ;                               0=deshabilitado.                                
+                      00121                                                                                                         
+                                            ; Bit 5-4       VCFG <1:0> bits de configuración de las tensiones de referencia 
+                      00122                                                                                                         
+                                            ;                               Estado lógico    VREF+ VREF- 
+                      00123                                                                                                         
+                                            ;                               00                   AVDD  AVSS         *Elegimo
+                      00124                                                                                                         
+                                            ;                               01                   AVDD   VREF-
+                      00125                                                                                                         
+                                            ;                               10                   VREF+   AVSS
+                      00126                                                                                                         
+                                            ;                               11                   VREF+   VREF-
+                      00127                                                                                                         
+                                            ; Bit  3-0      Sin implementación leídos como ‘0’
+                      00128 
+                      00129                                                                                                         
+                                            ;primero vamos a poner el ADSC2=0, pero creo que en el reset es 0 :)            
+                      00130 
+001A   1283           00131                                                         BCF             STATUS,RP0              ;selecci
+                            onamos banco 0
+                      00132 
+001B   30C0           00133                                                         MOVLW           H'C0'
+001C   009F           00134                                                         MOVWF           ADCON0                  ;       
+                                    •       Seleccionar canal de entrada A/D        (ADCON0)        BANCO 0
+                      00135 
+                      00136                                                                                                         
+                                            ; ADCON0:       ADSC1   ADCS0   CHS2    CHS1    CHS0    DO/DONE -       ADON
+                      00137                                                                                                         
+                                            ;Bit 7-6        ADSC<1:0> selección de bits del reloj de conversión
+                      00138                                                                                                         
+                                            ;       If ADSC2=0
+                      00139                                                                                                         
+                                            ;               00 Fosc/2
+                      00140                                                                                                         
+                                            ;               01 Fosc/8
+                      00141                                                                                                         
+                                            ;               10 Fosc/32
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00142                                                                                                         
+                                            ;               11 FRC (reloj derivado del oscilador interno RC del modulo A/D) 
+                      00143                                                                                                         
+                                            ;       if ADSC2=1
+                      00144                                                                                                         
+                                            ;               00 Fosc/4
+                      00145                                                                                                         
+                                            ;               01 Fosc/16
+                      00146                                                                                                         
+                                            ;               10 Fosc/64
+                      00147                                                                                                         
+                                            ;               11 FRC (reloj derivado del oscilador interno RC del modulo A/D) 
+                      00148                                                                                                         
+                                            ;Bit 5-3        CHS <2:0> selección de bits para los canales analógicos
+                      00149                                                                                                         
+                                            ;               000 canal 0 (RA0/AN0)
+                      00150                                                                                                         
+                                            ;               001 canal 1 (RA1/AN1)
+                      00151                                                                                                         
+                                            ;               010 canal 2 (RA2/AN2)
+                      00152                                                                                                         
+                                            ;               011 canal 3 (RA3/AN3)
+                      00153                                                                                                         
+                                            ;               100 canal 4 (RA4/AN4)
+                      00154                                                                                                         
+                                            ;               101 canal 5 (RB6/AN5)
+                      00155                                                                                                         
+                                            ;               110 canal 6 (RB7/AN6)
+                      00156                                                                                                         
+                                            ;Bit 2  GO/DONE_ bit de estado de la conversión (A/D)
+                      00157                                                                                                         
+                                            ;               If ADON=1
+                      00158                                                                                                         
+                                            ;                                       1=la conversión esta en progreso (ponien
+                      00159                                                                                                         
+                                            ;                                       0=la conversión no esta en progreso (est
+                      00160                                                                                                         
+                                            ;Bit 1  Sin implementar: leído como ‘0’
+                      00161                                                                                                         
+                                            ;Bit 0  ADON: bit de encendido del A/D
+                      00162                                                                                                         
+                                            ;                                       1=modulo convertidor A/D esta operando
+                      00163                                                                                                         
+                                            ;                                       0=modulo convertidor esta apagado y no c
+                      00164         
+                      00165                 ;hecho arriba                                                                           
+                                    ;               •       Seleccionar reloj de conversión A/D     (ADCON0)
+                      00166 
+                      00167 
+                      00168 
+                      00169 ;################################# PRUEBA EL SET POINT, AUNQUE NO SE SIMULE  ###########################
+                            ##
+                      00170 
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00171 ;{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ {{{{{{{{{{{{{{{{{{{{{{{{  SUBRUTINA DE INTER
+                            RUPCION }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+                      00172 
+                      00173                 ; ============ guarda registros importantes =====================
+                      00174 
+001D   00AB           00175 SP_INTERRUPT    MOVWF   W_TEMP          ;Copy W to TEMP register
+001E   0E03           00176                                 SWAPF           STATUS,W                ;Swap status to be saved into W
+001F   0183           00177                                 CLRF            STATUS          ;bank 0, regardless of current bank, Cle
+                            ars IRP,RP1,RP0
+0020   00A9           00178                                 MOVWF   STATUS_TEMP     ;Save status to bank zero STATUS_TEMP register
+0021   080A           00179                                 MOVF            PCLATH, W               ;Only required if using page 1
+0022   00AA           00180                                 MOVWF   PCLATH_TEMP     ;Save PCLATH into W
+0023   018A           00181                                 CLRF            PCLATH          ;Page zero, regardless of current page
+                      00182 
+                      00183                                 ; ============ inicia configuracion del set point
+                      00184 
+0024   01A4           00185                                 CLRF            UNI                             ;limpia los registros im
+                            portantes
+0025   01A5           00186                                 CLRF            DECE                    ;limpia reg
+0026   3005           00187                                 MOVLW           B'0101'                 ;carga con 5 el registro W
+0027   00A6           00188                                 MOVWF           SP                              ;mueve el reg W al regis
+                            tro SP
+0028   206E           00189                                 CALL            SENAL_SP                ; envia señal SP a los displays 
+                            7 segmentos
+0029   209A           00190                                 CALL            retraso_500ms           ; retraso de medio segundo para 
+                            visualizar señal SP
+                      00191 
+                      00192                                 ;---------subrutina principal de la interrupcion del set poin  - monitor
+                            ea si has presionado boton de unidades o de decenas ----------------------------
+                      00193 
+002A   1C86           00194 monitor_u               BTFSS           PORTB,1
+002B   282D           00195                                 goto            monitor_d
+002C   283E           00196                                 goto            config_u
+                      00197 
+002D   1D06           00198 monitor_d               BTFSS           PORTB,2
+002E   2830           00199                                 goto            sigue_monitor
+002F   284B           00200                                 goto            config_d
+                      00201 
+0030   2058           00202 sigue_monitor   call                    despliega_u
+0031   2061           00203                                 call                    despliega_d
+0032   209A           00204 CONTINUA                call                    retraso_500ms
+                      00205                                 ;call                   envia_nada_al_display
+0033   1103           00206                                 BCF             STATUS,2                                ;pone a cero bit
+                             Z; por si anda por ahi activo.
+0034   0BA6           00207                                 DECFSZ   SP,1                                   ;decrementa SP, si es ce
+                            ro salta
+0035   282A           00208                                 GOTO            monitor_u                               ;regresa a segui
+                            r monitoreando las unidades
+0036   2090           00209                                 CALL            BCD_BINARIO                                             
+                      00210 
+                      00211                         ;               
+                      00212                         ; ========== recuperacion de reg import =============
+                      00213                 
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0037   082A           00214                                 MOVF            PCLATH_TEMP,W           ;Restore PCLATH
+0038   008A           00215                                 MOVWF   PCLATH                          ;Move W into PCLATH
+0039   0E29           00216                                 SWAPF           STATUS_TEMP,W           ;Swap STATUS_TEMP register into 
+                            W
+                      00217                                                                                                 ;(sets b
+                            ank to original state)
+003A   0083           00218                                 MOVWF   STATUS                          ;Move W into STATUS register
+003B   0EAB           00219                                 SWAPF           W_TEMP,F                                ;Swap W_TEMP
+003C   0E2B           00220                                 SWAPF           W_TEMP,W                                ;Swap W_TEMP int
+                            o W
+                      00221 
+003D   2805           00222                                 GOTO            INICIO                                                  
+                                    ;regresa de la interrupcion
+                      00223 
+                      00224                                                 
+                      00225 ;-----------entra a configurar unidades en el set point ------------------------------------
+                      00226 
+003E   0AA4           00227 config_u                INCF            UNI,1                   ;incrementa el registro UNI, lo almacena
+                             en UNI, afecta Z
+                      00228 
+                      00229                         ;----------------------verifica si es mayor a 9 --------------------------------
+                            -----------------
+                      00230 
+003F   1103           00231                         BCF             STATUS,2                ;pone a cero bit Z
+0040   3015           00232                         MOVLW           B'10101'                        ;carga registro W con 10 decimal
+0041   0224           00233                         SUBWF           UNI,0                   ;(UNI)-(W)->(W), el resultado lo guarda 
+                            en W, sin alterar UNI
+0042   1D03           00234                         BTFSS           STATUS,2                ;verifica si el bit Z esta a 1, y salta
+0043   2845           00235                         GOTO            SIGUE1                          
+0044   206A           00236                         CALL            UNI_A_CERO
+0045   3005           00237 SIGUE1          MOVLW           B'0101'                 ;carga con 5 el registro W
+0046   00A6           00238                         MOVWF           SP                              ;mueve el reg W al registro SP
+0047   2058           00239                         CALL            despliega_u             ;despliega el reg unidades en el display
+                             7 segmentos
+                      00240 
+                      00241                 ;---------------verifica si el boton sigue presionado ----------------------------------
+                            ------------            
+                      00242 
+0048   1C86           00243 LAZO1           BTFSS           PORTB,1         ;
+0049   2832           00244                         goto            CONTINUA
+004A   2848           00245                         goto            LAZO1
+                      00246 
+                      00247 ;------------------ AQUI TERMINA DE CONFIGURAR UNIDADES ------------------------------------------------
+                            ---------------------------------
+                      00248                         
+                      00249 ;-----------entra a configurar decenas en el set point ------------------------------------
+                      00250 
+004B   0AA5           00251 config_d                INCF            DECE,1                  ;incrementa el registro UNI, lo almacena
+                             en UNI, afecta Z
+                      00252 
+                      00253                         ;------------------------------------ verifica si es mayor a 9 -----------------
+                            --------------------------------
+                      00254 
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+004C   1103           00255                         BCF             STATUS,2        ;pone a cero bit Z
+004D   3015           00256                         MOVLW           B'10101'                ;carga registro W con 10 decimal
+004E   0225           00257                         SUBWF           DECE,0          ;(UNI)-(W)->(W), el resultado lo guarda en W, si
+                            n alterar UNI
+004F   1D03           00258                         BTFSS           STATUS,2        ;verifica si el bit Z esta a 1, y salta
+0050   2852           00259                         GOTO            SIGUE2                          
+0051   206C           00260                         CALL            DECE_A_CERO
+0052   3005           00261 SIGUE2          MOVLW           B'0101'         ;carga con 5 el registro W
+0053   00A6           00262                         MOVWF           SP                      ;mueve el reg W al registro SP
+0054   2061           00263                         CALL            despliega_d     ;despliega el reg unidades en el display 7 segme
+                            ntos
+                      00264 
+                      00265                         ;---------------------------------  verifica si el boton sigue presionado ------
+                            ----------------------------------------                
+                      00266 
+0055   1C86           00267 LAZO2           BTFSS           PORTB,1         ;
+0056   2832           00268                         goto            CONTINUA
+0057   2855           00269                         goto            LAZO2
+                      00270 
+                      00271 ;------------------ AQUI TERMINA DE CONFIGURAR DECENAS -------------------------------------------------
+                            --------------------------------
+                      00272 
+                      00273 ;---------------- subrutina que despliega el registro UNI en el display de 7 segmentos -----------------
+                            ---
+                      00274         
+0058   0824           00275 despliega_u     MOVF            UNI,0                                   ; mueve el contenido de UNI al r
+                            egistro W
+                      00276                                                                                         ; RA4,RA5,RA6,RA
+                            7       UNIDADES
+                      00277                                                                                         ; RB4,RB5,RB6,RB
+                            7       DECENAS
+0059   00A7           00278                         MOVWF           uni_comodin                     ; mueve W al registro unidades c
+                            omodin
+005A   0DA7           00279                         RLF             uni_comodin,1           ; rota a la izq. el registo uni_comodin 
+                            y el resultado ponlo ahi mismo
+005B   0DA7           00280                         RLF             uni_comodin,1
+005C   0DA7           00281                         RLF             uni_comodin,1
+005D   0DA7           00282                         RLF             uni_comodin,1   
+                      00283 
+005E   0827           00284                         MOVF            uni_comodin,0           ;mueve el contenido de uni_comodin al re
+                            gistro W
+005F   0085           00285                         MOVWF           PORTA                           ;mueve W al puerto A
+0060   0008           00286                         RETURN  
+                      00287 ;---------------------------------------------------------------------------------------------
+                      00288 
+                      00289 ;-------------- subrutina que despliega el registro DECE en el display de 7 segmentos ------------------
+                            --
+                      00290         
+0061   0825           00291 despliega_d     MOVF            DECE,0                  ; mueve el contenido de DEE al registro W
+                      00292                                                                                 ; RA4,RA5,RA6,RA7       
+                            UNIDADES
+                      00293                                                                                 ; RB4,RB5,RB6,RB7       
+                            DECENAS
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0062   00A8           00294                         MOVWF           dece_comodin    ; mueve W al registro unidades comodin
+0063   0DA8           00295                         RLF             dece_comodin,1  ; rota a la izq. el registo dece_comodin y el re
+                            sultado ponlo ahi mismo
+0064   0DA8           00296                         RLF             dece_comodin,1
+0065   0DA8           00297                         RLF             dece_comodin,1
+0066   0DA8           00298                         RLF             dece_comodin,1  
+                      00299 
+0067   0828           00300                         MOVF            dece_comodin,0  ;mueve el contenido de uni_comodin al registro W
+0068   0086           00301                         MOVWF           PORTB                   ;mueve W al puerto B
+0069   0008           00302                         RETURN  
+                      00303 ;---------------------------------------------------------------------------------------------
+                      00304 
+                      00305 
+                      00306 ;------------ subrutina que limpia el registro UNI -------------------------------------------
+                      00307 
+006A   01A4           00308 UNI_A_CERO              CLRF            UNI             ;pone a ceros registro UNI, Z es afectado.
+006B   0008           00309                                         RETURN                  ;regresa al flujo del programa          
+                      00310 ;---------------------------------------------------------------------------------------------
+                      00311 
+                      00312 ;------------- subrutina que limpia el registro DECE -----------------------------------------
+                      00313 
+006C   01A5           00314 DECE_A_CERO             CLRF            DECE            ;pone a ceros registro UNI, Z es afectado.
+006D   0008           00315                                         RETURN                          ;regresa al flujo del programa  
+                                    
+                      00316 ;----------------------------------------------------------------------------------------------
+                      00317 
+                      00318 ;------------ subrutina para enviar señal SP al display ---------------------------
+                      00319 
+006E   3005           00320 SENAL_SP        MOVLW           B'0101'         ; carga un 5, para mostrarlo como S
+006F   00A8           00321                         MOVWF           dece_comodin    ; mueve W al registro decenas comodin
+0070   0DA8           00322                         RLF             dece_comodin,1  ; rota a la izq. el registo dece_comodin y el re
+                            sultado ponlo ahi mismo
+0071   0DA8           00323                         RLF             dece_comodin,1
+0072   0DA8           00324                         RLF             dece_comodin,1
+0073   0DA8           00325                         RLF             dece_comodin,1          
+                      00326 
+0074   0828           00327                         MOVF            dece_comodin,0  ;mueve el contenido de dece_comodin al registro 
+                            W
+0075   0086           00328                         MOVWF           PORTB           ;mueve W al puerto B
+                      00329 
+0076   300E           00330                         MOVLW           B'1110'         ; carga un 14, para mostrar un E, al reves ja
+0077   00A7           00331                         MOVWF           uni_comodin     ; mueve W al registro decenas comodin
+0078   0DA7           00332                         RLF             uni_comodin,1   ; rota a la izq. el registo uni_comodin y el res
+                            ultado ponlo ahi mismo
+0079   0DA7           00333                         RLF             uni_comodin,1
+007A   0DA7           00334                         RLF             uni_comodin,1
+007B   0DA7           00335                         RLF             uni_comodin,1           
+                      00336                 
+007C   0827           00337                         MOVF            uni_comodin,0   ;mueve el contenido de uni_comodin al registro W
+007D   0085           00338                         MOVWF           PORTA           ;mueve W al puerto A
+                      00339 
+007E   0008           00340                         RETURN                  
+                      00341 ;-------------------------------------------------------------------------------------------------------
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            ------------------------------------------------------------------------------------------------
+                      00342 
+                      00343 ;-------------------------------------Envia nada al display para hacer que parpadee la configuracion pue
+                            sta---------------------------------------------------------------------------------------------
+                      00344 
+007F   300F           00345 envia_nada_al_display   MOVLW           B'1111'                         ; carga un 15, para mostrar nada
+                             en el display
+0080   00A8           00346                                                 MOVWF           dece_comodin            ; mueve W al reg
+                            istro decenas comodin
+0081   0DA8           00347                                                 RLF             dece_comodin,1          ; rota a la izq.
+                             el registo dece_comodin y el resultado ponlo ahi mismo
+0082   0DA8           00348                                                 RLF             dece_comodin,1
+0083   0DA8           00349                                                 RLF             dece_comodin,1
+0084   0DA8           00350                                                 RLF             dece_comodin,1          
+                      00351 
+0085   0828           00352                                                 MOVF            dece_comodin,0          ;mueve el conten
+                            ido de dece_comodin al registro W
+0086   0086           00353                                                 MOVWF           PORTB                           ;mueve W
+                             al puerto B
+                      00354 
+0087   300F           00355                                                 MOVLW           B'1111'                         ; carga 
+                            un 15, para mostrar un E
+0088   00A8           00356                                                 MOVWF           dece_comodin                    ; mueve 
+                            W al registro decenas comodin
+0089   0DA8           00357                                                 RLF             dece_comodin,1          ; rota a la izq.
+                             el registo uni_comodin y el resultado ponlo ahi mismo
+008A   0DA8           00358                                                 RLF             dece_comodin,1
+008B   0DA8           00359                                                 RLF             dece_comodin,1
+008C   0DA8           00360                                                 RLF             dece_comodin,1          
+                      00361                 
+008D   0828           00362                                                 MOVF            dece_comodin,0          ;mueve el conten
+                            ido de uni_comodin al registro W
+008E   0085           00363                                                 MOVWF           PORTA                           ;mueve W
+                             al puerto A
+                      00364 
+008F   0008           00365                                                 RETURN                  
+                      00366 ;-------------------------------------------------------------------------------------------------------
+                            ------------------------------------------------------------------------------------------------
+                      00367 
+                      00368 ;--------------- subrutina para convertir de BCD a BINARIO ----------------------------------------
+                      00369 
+0090   0825           00370 BCD_BINARIO     MOVF            DECE,0                          ; mueve el contenido de DECE al registro
+                             W
+0091   00A8           00371                                 MOVWF           dece_comodin            ; mueve W al registro decenas co
+                            modin                                   
+0092   0DA8           00372                                 RLF             dece_comodin,1          ; rota a la izq. el registo dece
+                            _comodin y el resultado ponlo ahi mismo
+0093   0DA8           00373                                 RLF             dece_comodin,1          ; rota a la izq. el registo dece
+                            _comodin y el resultado
+0094   0828           00374                                 MOVF                    dece_comodin,0                  ; mueve dece_com
+                            odin al registro W
+0095   07A5           00375                                 ADDWF           DECE,1                          ; suma W+DECE, el result
+                            ado almacenalo en DECE
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0096   0D25           00376                                 RLF             DECE,0                          ; rota a la izq. el regi
+                            sto, el resultado ponlo en W
+0097   07A4           00377                                 ADDWF           UNI,1                           ; suma W+UNI, el resulta
+                            do almacenalo en W
+0098   00AC           00378                                 MOVWF           BINARIO                         ; mueve W al registro BI
+                            NARIO
+0099   0008           00379                                 RETURN                                          ; regresa de la Subrutin
+                            a
+                      00380 ;-------------------------------------------------------------------------------------------
+                      00381 
+                      00382 ;***************************************************************
+                      00383 
+009A   3003           00384 retraso_500ms           MOVLW                   D'3'
+                      00385                                         ;MOVWF                  z3
+                      00386                                         ;MOVLW                  D'137'
+                      00387                                         ;MOVWF                  z2
+                      00388                                         ;DECFSZ         z1,f
+                      00389                                         ;GOTO                   $-1
+                      00390                                         ;DECFSZ         z2,f
+                      00391                                         ;GOTO                   $-3
+                      00392                                         ;DECFSZ         z3,f
+                      00393                                         ;GOTO                   $-5
+009B   0008           00394                                         RETURN
+                      00395         
+                      00396 ;***************************************************************
+                      00397 ;*************Retraso **************************************************
+                      00398 
+009C   3003           00399 RETRASO                 MOVLW                   D'3'
+                      00400                                         ;MOVWF                  z3
+                      00401                                         ;MOVLW                  D'137'
+                      00402                                         ;MOVWF                  z2
+                      00403                                         ;DECFSZ                 z1,f
+                      00404                                         ;GOTO                   $-1
+                      00405                                         ;DECFSZ                 z2,f
+                      00406                                         ;GOTO                   $-3
+                      00407                                         ;DECFSZ                 z3,f
+                      00408                                         ;GOTO                   $-5
+009D   0008           00409                                         RETURN
+                      00410         
+                      00411 ;#######################################################################################################
+                            ############################
+009E   3004           00412 Un_segundo                      MOVLW           H'04'                   ;mueve 4 al registro contador   
+009F   00AF           00413                                         MOVWF           CONTADOR3                       ;mueve el conten
+                            ido de W a contador3    
+                      00414                                                                 
+00A0   30FA           00415                                         MOVLW           H'FA'                   ;mueve 255 al registro c
+                            ontador 
+00A1   00AE           00416                                         MOVWF           CONTADOR2                       ;mueve el conten
+                            ido de W a contador2    
+                      00417                                                                 
+00A2   30A6           00418                                         MOVLW           H'A6'                   ;mueve A6 al registro co
+                            ntador  MOVLW
+00A3   00AD           00419                                         MOVWF           CONTADOR1                       ;mueve el conten
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            ido de W a contador1    MOVWF
+                      00420                                                                 
+00A4   0BAF           00421 Has_4                           DECFSZ  CONTADOR3,1                             
+00A5   28A7           00422                                         GOTO            Has_250                         
+00A6   28AD           00423                                         GOTO            Sigue                           
+                      00424                                                                 
+00A7                  00425 Has_250                                                         
+00A7   0BAE           00426                                         DECFSZ  CONTADOR2,1                             
+00A8   28AA           00427                                         GOTO            Un_ms                           
+00A9   28A4           00428                                         GOTO            Has_4                           
+                      00429                                                                 
+00AA   20AE           00430 Un_ms                           CALL            Medio_ms                        ;retraso ½ ms   (2)
+00AB   20AE           00431                                         CALL            Medio_ms                        ;retraso ½ ms   
+00AC   28A7           00432                                         GOTO            Has_250                         
+                      00433                                                                 
+00AD   0008           00434 Sigue                           RETURN                                          ; SALE DE LA SUBRUTINA D
+                            E 1 SEGUNDO
+                      00435 
+                      00436 ;############ SUBRUTINA DE MEDIO MILISEGUNDO ###########################################################
+                            #######################################                                                         
+00AE                  00437 Medio_ms                                                                
+00AE   0BAD           00438 ETIQUETA                        DECFSZ  CONTADOR1,1             ;drecrementa CONTADOR en una unidad,alma
+                            cenalo en el mismo registro     LAZO
+00AF   28AE           00439                                         GOTO            ETIQUETA                                ;y salta
+                             si es zero.    
+00B0   0008           00440                                         RETURN                                          
+                      00441 
+                      00442 ;#######################################################################################################
+                            ############################    
+                      00443                                         END
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 13
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+ANSEL                             0000009B
+BCD_BINARIO                       00000090
+BF                                00000000
+BINARIO                           0000002C
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1H                            00000016
+CCPR1L                            00000015
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CONTADOR1                         0000002D
+CONTADOR2                         0000002E
+CONTADOR3                         0000002F
+CONTINUA                          00000032
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DECE                              00000025
+DECE_A_CERO                       0000006C
+D_A                               00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+ETIQUETA                          000000AE
+F                                 00000001
+FERR                              00000002
+FREE                              00000004
+FSR                               00000004
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+Has_250                           000000A7
+Has_4                             000000A4
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+INDF                              00000000
+INICIO                            00000005
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IOFS                              00000002
+IRCF0                             00000004
+IRCF1                             00000005
+IRCF2                             00000006
+IRP                               00000007
+LAZO1                             00000048
+LAZO2                             00000055
+Medio_ms                          000000AE
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OERR                              00000001
+OPTION_REG                        00000081
+OSCCON                            0000008F
+OSCTUNE                           00000090
+OSFIE                             00000007
+OSFIF                             00000007
+OSTS                              00000003
+P                                 00000004
+PCL                               00000002
+PCLATH                            0000000A
+PCLATH_TEMP                       0000002A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+R                                 00000002
+RBIE                              00000003
+RBIF                              00000000
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+READ_WRITE                        00000002
+RETRASO                           0000009C
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+R_W                               00000002
+S                                 00000003
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+SCS0                              00000000
+SCS1                              00000001
+SENAL_SP                          0000006E
+SIGUE1                            00000045
+SIGUE2                            00000052
+SMP                               00000007
+SP                                00000026
+SPBRG                             00000099
+SPEN                              00000007
+SP_INTERRUPT                      0000001D
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+STATUS_TEMP                       00000029
+SWDTE                             00000000
+SWDTEN                            00000000
+SYNC                              00000004
+Sigue                             000000AD
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1RUN                             00000006
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISB                             00000086
+TRMT                              00000001
+TUN0                              00000000
+TUN1                              00000001
+TUN2                              00000002
+TUN3                              00000003
+TUN4                              00000004
+TUN5                              00000005
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+UNI                               00000024
+UNI_A_CERO                        0000006A
+Un_ms                             000000AA
+Un_segundo                        0000009E
+VCFG0                             00000004
+VCFG1                             00000005
+W                                 00000000
+WCOL                              00000007
+WDTCON                            00000105
+WDTPS0                            00000001
+WDTPS1                            00000002
+WDTPS2                            00000003
+WDTPS3                            00000004
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+W_TEMP                            0000002B
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_CCP1_RB0                         00003FFF
+_CCP1_RB3                         00002FFF
+_CONFIG1                          00002007
+_CONFIG2                          00002008
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_EXTCLK                           00003FEF
+_EXTRC_CLKOUT                     00003FFF
+_EXTRC_IO                         00003FFE
+_FCMEN_OFF                        00003FFE
+_FCMEN_ON                         00003FFF
+_HS_OSC                           00003FEE
+_IESO_OFF                         00003FFD
+_IESO_ON                          00003FFF
+_INTRC_CLKOUT                     00003FFD
+_INTRC_IO                         00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_MCLR_OFF                         00003FDF
+_MCLR_ON                          00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_ENABLE_1024                  00003BFF
+_WRT_ENABLE_512                   00003DFF
+_WRT_ENABLE_OFF                   00003FFF
+_XT_OSC                           00003FED
+__16F88                           00000001
+config_d                          0000004B
+config_u                          0000003E
+dece_comodin                      00000028
+despliega_d                       00000061
+despliega_u                       00000058
+envia_nada_al_display             0000007F
+monitor_d                         0000002D
+monitor_u                         0000002A
+retraso_500ms                     0000009A
+sigue_monitor                     00000030
+uni_comodin                       00000027
+z1                                00000020
+z2                                00000021
+z3                                00000022
+z4                                00000023
+MPASM 03.60 Released                      PRUEBA_SETPOINT.ASM   6-24-2007  8:09:00         PAGE 19
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX X---------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:   174
+Program Memory Words Free:  3922
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     0 reported,     8 suppressed
+
+

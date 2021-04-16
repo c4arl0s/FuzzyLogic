@@ -1,0 +1,1120 @@
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;***************************************************************
+                      00002         ; PROGRAMA CONTROL DIFUSO DE TEMPERATURA
+                      00003 
+                      00004         ;title  "PIC Sample code: PIC16F88 program"
+                      00005         ;subtitle       "CARLOS SANTIAGO CRUZ - "
+                      00006 
+                      00007 ;       codigo para el 16f88 a 4 MHz, RELOJ INTERNO RC
+                      00008 ;***************************************************************
+                      00009         list    p=16F88
+                      00010         #include        <p16F88.inc>
+                      00001         LIST
+                      00002 ; P16F88.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
+                      00401         LIST
+                      00011         
+                      00012 ;       __CONFIG        _CONFIG1  & _CCP1_RB0 & _DEBUG_OFF & _CPD_OFF & _LVP_OFF & _BODEN_OFF & _MCLR_OF
+                            F & _PWRTE_ON & _WDT_OFF & _INTRC_IO
+                      00013 ;*      ERRORLEVEL -302
+                      00014 
+                      00015 ;***************************************************************
+                      00016 #DEFINE BANCO0  BCF     STATUS,5
+                      00017 #DEFINE BANCO1  BSF     STATUS,5
+                      00018 
+                      00019 ;
+  00000020            00020 z1                              equ     20h             ;REGISTROS COMODINES
+  00000021            00021 z2                              equ     21h
+  00000022            00022 z3                              equ     22h
+  00000023            00023 z4                              equ     23h
+                      00024 ;****************************************************************
+  00000024            00025 UNI                             equ     24h
+  00000025            00026 DECE                    equ     25h
+  00000026            00027 SP                              equ     26h
+  00000027            00028 uni_comodin             equ     27h
+  00000028            00029 dece_comodin    equ     28h
+  00000029            00030 STATUS_TEMP     equ 29h
+  0000002A            00031 PCLATH_TEMP     equ 2Ah
+  0000002B            00032 W_TEMP          equ     2Bh
+                      00033 ;**************************************************
+  0000002C            00034 BINARIO_SP              equ     2Ch
+  0000002D            00035 CONTADOR1       equ 2Dh
+  0000002E            00036 CONTADOR2       equ 2Eh
+  0000002F            00037 CONTADOR3       equ 2Fh
+                      00038 ;********************** 
+  00000030            00039 BCDH                    equ 30h
+  00000031            00040 BCDL                    equ 31h
+  00000032            00041 BCD_TEMP                equ 32h
+  00000033            00042 CUENTA          equ 33h
+  00000034            00043 BIN                             equ 34h
+  00000035            00044 BIN_comodin             equ 35h
+                      00045 
+                      00046 ;***************************************************************
+                      00047 ; RECORDATORIO DE EN DONDE SE ENCUENGRAN ALGUNOS REGISTROS 
+                      00048 ;       ADRESH  1Eh             banco 0
+                      00049 ;       ADRESL  9Eh             banco 1
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00050 ;       ANSEL           9Bh             banco 1
+                      00051 ;       ADCON0  1Fh             banco 0
+                      00052 ;       ADCON1  9Fh             banco 1
+                      00053 ;****************************************************************
+                      00054 
+                      00055 ;#######################################################################################################
+                            ############################
+0000                  00056                                                         ORG             0x0000
+0000   2805           00057                                                         GOTO            INICIO
+                      00058         
+                      00059 
+                      00060 
+0005                  00061                                                         ORG             0x05
+                      00062 ;#######################################################################################################
+                            ############################
+                      00063 
+                      00064 
+0005                  00065 INICIO                                          ; Limpia todos los registros a usar
+                      00066         
+0005   0185           00067                                                         CLRF            PORTA                           
+                                                    ; limpia puerto A
+0006   0186           00068                                                         CLRF            PORTB                           
+                                                    ; limpia puerto B
+0007   01A0           00069                                                         CLRF            z1                              
+                                    
+0008   01A1           00070                                                         CLRF            z2                              
+0009   01A2           00071                                                         CLRF            z3                              
+000A   01A3           00072                                                         CLRF            z4                              
+                      00073                                                         ;***********************************************
+                            *****************
+000B   01A4           00074                                                         CLRF            UNI                             
+000C   01A5           00075                                                         CLRF            DECE                    
+000D   01A6           00076                                                         CLRF            SP                              
+000E   01A7           00077                                                         CLRF            uni_comodin             
+000F   01A8           00078                                                         CLRF            dece_comodin    
+0010   01A9           00079                                                         CLRF            STATUS_TEMP     
+0011   01AA           00080                                                         CLRF            PCLATH_TEMP     
+0012   01AB           00081                                                         CLRF            W_TEMP          
+                      00082                                                         ;***********************************************
+                            ***
+0013   01AC           00083                                                         CLRF            BINARIO_SP                      
+0014   01AD           00084                                                         CLRF            CONTADOR1       
+0015   01AE           00085                                                         CLRF            CONTADOR2       
+0016   01AF           00086                                                         CLRF            CONTADOR3       
+                      00087                                                         ;********************** 
+0017   01B0           00088                                                         CLRF            BCDH                    
+0018   01B1           00089                                                         CLRF            BCDL                    
+0019   01B2           00090                                                         CLRF            BCD_TEMP                
+001A   01B3           00091                                                         CLRF            CUENTA          
+001B   01B4           00092                                                         CLRF            BIN                             
+001C   01B5           00093                                                         CLRF            BIN_comodin                     
+                                                            
+                      00094                                                         ;-----------------------------------------------
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            ------------------------------------------------------------------------------------------------
+001D   1683           00095                                                         BSF             STATUS,RP0                      
+                                            ; selecciona Banco 1; Se encuentran registros TRISA y TRISB
+001E   1303           00096                                                         BCF             STATUS,RP1                      
+                                            ; al reset STATUS=00000000
+                      00097                                                                                                         
+                                                                    ; REGISTRO STATUS =     IRP             RP1             
+                      00098                                                                                                         
+                                                                    ;  RP1 RP0
+                      00099                                                                                                         
+                                                                    ;  0            0               banco 0
+                      00100                                                                                                         
+                                                                    ;  0            1               banco 1         RP0=1
+                      00101                                                                                                         
+                                                                    ;  1            0               banco 2
+                      00102                                                                                                         
+                                                                    ;  1            1               banco 3
+                      00103 
+                      00104 
+                      00105 
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001F   170F           00106                                                         BSF             OSCCON,6                        
+                                                    ;Pone el oscilador a 4 MHz con el oscilador interno RC; OSCCON controla 
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0020   168F           00107                                                         BSF             OSCCON,5                        
+                                                    ;bit 6-4                110             4 MHZ
+                      00108                                                                                                         
+                                                                    ;al reset inicia con 0's el registro.
+                      00109                                                         ;-----------------------------------------------
+                            ------------------------------------------------------------------------------------------------
+0021   3007           00110                                                         MOVLW           H'07'                           
+                                                    ;carga el registro W con 07             0000 0111
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0022   009C           00111                                                         MOVWF           CMCON                           
+                                                    ;CMCON ->       C2OUT   C1OUT   C2INV   C1INV   CIS      CM2  CM1  CM0
+                      00112                                                                                                         
+                                                                    ; ver los modos de operacion de los comparadores
+                      00113                                                                                                         
+                                                                    ; comparadores apagados
+                      00114                                                                                                         
+                                                                    ;CLRF           TRISA                   ;Puerto A como s
+                      00115 
+                      00116 ;##### CONFIGURA LOS PUERTOS  A y B, (A0,A1,A2,A3 = ENTRADAS)  (A4,A5,A6,A7=SALIDAS),  (B0,B1,B2,B3 = EN
+                            TRADAS)  (B4,B5,B6,B7=SALIDAS) ##################
+0023   1683           00117                                                         BSF             STATUS,RP0                      
+                                            ; cambio a banco 1
+                      00118                                                         
+0024   30BD           00119                                                         MOVLW           B'10111101'                     
+                                                    ; RA7   RA6             RA5             RA4             RA3             
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0025   0085           00120                                                         MOVWF           TRISA                           
+                                                    ;    1            0               1               1               1     
+                      00121                                                                                                         
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                                                                    ;Puerto A como salida           0 - salida;     1 - entr
+0026   3001           00122                                                         MOVLW           B'00000001'                     
+                                                    ; RA7   RA6             RA5             RA4             RA3             
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0027   0086           00123                                                         MOVWF           TRISB                           
+                                                    ;    0            0               0               0               0     
+                      00124 
+                      00125                                                         
+                      00126 
+                      00127 ;########################################## CONFIGURANDO EL CONVERTIDOR A/D ############################
+                            ##############################
+                      00128 
+                      00129                                                                                                         
+                                            ;1.     Configure el modulo A/D
+                      00130                                                                                                         
+                                            ;               •       Configurar E/S analógica/digital        (ANSEL) BANCO 1 
+0028   1683           00131                                                         BSF             STATUS,RP0              ; selecc
+                            iona banco 1
+                      00132                                                         
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0029   141B           00133                                                         BSF                     ANSEL,0         ; Regist
+                            ro ANSEL - ANS6 ANS5 ANS4 ANS3 ANS2 ANS1 ANS0 
+                      00134                                                                                                         
+                                            ; Configura la funcion de los pines de los puertos
+                      00135                                                                                                         
+                                            ; pueden ser configurados como entradas analògicas 
+                      00136                                                                                                         
+                                            ; (RA3,RA2 tambien pueden ser tensiones de referencia)
+                      00137                                                                                                         
+                                            ; o como entradas/salidas digitales; 
+                      00138                                                                                                         
+                                            ;       1 - analog I/O; 
+                      00139                                                                                                         
+                                            ;       0 - digital I/O
+                      00140                                                                                                         
+                                            ; 
+                      00141                                                                                                         
+                                            ;-------------------------------------------------------------------------------
+002A   1683           00142                                                         BSF                     STATUS,RP0      ;       
+                            (selecciona banco 1)                                                                            
+                      00143                                                                                                         
+                                            ;               •       Configurar tensión de referencia.       (ADCON1)        
+                      00144 
+                      00145                                                                                                         
+                                            ; ADCON1:       ADFM    ADCS2   VCFG1           VCFG0     --      --      --    
+                      00146                                                                                                         
+                                            ; Bit 7 ADFM: selección de bit de resultado de formato A/D
+                      00147                                                                                                         
+                                            ;                               1=justificación derecha: los seis bits mas signi
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002B   139F           00148                                                         BCF                     ADCON1,7                
+                            ;                               0=justificación izquierda: los seis bits menos significativos de
+                      00149                                                                                                         
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                                            ; Bit 6 ADSC2: bit de selección de división de reloj por 2 del A/D
+                      00150                                                                                                         
+                                            ;                               1=fuente de reloj es dividida por 2 cuando el si
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002C   131F           00151                                                         BCF                     ADCON1,6                
+                            ;                               0=deshabilitado.                                                
+                      00152                                                                                                         
+                                            ; Bit 5-4       VCFG <1:0> bits de configuración de las tensiones de referencia 
+                      00153                                                                                                         
+                                            ;                               Estado lógico           VREF+ VREF- 
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002D   129F           00154                                                         BCF                     ADCON1,5                
+                            ;                               00                              AVDD  AVSS              *Elegimo
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002E   121F           00155                                                         BCF                     ADCON1,4                
+                            ;                               01                              AVDD   VREF-
+                      00156                                                                                                         
+                                            ;                               10                              VREF+   AVSS
+                      00157                                                                                                         
+                                            ;                               11                              VREF+   VREF-
+                      00158                                                                                                         
+                                            ; Bit  3-0      Sin implementación leídos como ‘0’
+                      00159 
+                      00160                                                                                                         
+                                            ;primero vamos a poner el ADSC2=0, pero creo que en el reset es 0 :)            
+                      00161                                                                                                         
+                                            ;-------------------------------------------------------------------------------
+002F   1283           00162                                                         BCF             STATUS,RP0              ; selecc
+                            iona banco 0
+                      00163                                                                                                         
+                                            ; ADCON0:       ADSC1   ADCS0   CHS2    CHS1    CHS0    DO/DONE --      ADON
+                      00164                                                                                                         
+                                            ;                               1               1          0             0      
+0030   179F           00165                                                         BSF             ADCON0,7                        
+                            ;Bit 7-6        ADSC<1:0> selección de bits del reloj de conversión
+0031   171F           00166                                                         BSF             ADCON0,6                        
+                            ;       If ADSC2=0
+                      00167                                                                                                         
+                                            ;               00 Fosc/2
+                      00168                                                                                                         
+                                            ;               01 Fosc/8
+                      00169                                                                                                         
+                                            ;               10 Fosc/32
+                      00170                                                                                                         
+                                            ;               11 FRC (reloj derivado del oscilador interno RC del modulo A/D) 
+                      00171                                                                                                         
+                                            ;       if ADSC2=1
+                      00172                                                                                                         
+                                            ;               00 Fosc/4
+                      00173                                                                                                         
+                                            ;               01 Fosc/16
+                      00174                                                                                                         
+                                            ;               10 Fosc/64
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00175                                                                                                         
+                                            ;               11 FRC (reloj derivado del oscilador interno RC del modulo A/D) 
+0032   129F           00176                                                         BCF             ADCON0,5                        
+                            ;Bit 5-3        CHS <2:0> selección de bits para los canales analógicos
+0033   121F           00177                                                         BCF             ADCON0,4                        
+                            ;               000 canal 0 (RA0/AN0)
+0034   119F           00178                                                         BCF             ADCON0,3                        
+                            ;               001 canal 1 (RA1/AN1)
+                      00179                                                                                                         
+                                            ;               010 canal 2 (RA2/AN2)
+                      00180                                                                                                         
+                                            ;               011 canal 3 (RA3/AN3)
+                      00181                                                                                                         
+                                            ;               100 canal 4 (RA4/AN4)
+                      00182                                                                                                         
+                                            ;               101 canal 5 (RB6/AN5)
+                      00183                                                                                                         
+                                            ;               110 canal 6 (RB7/AN6)
+                      00184                                                         ;(utilizados en prog princ)                     
+                            ;Bit 2  GO/DONE_ bit de estado de la conversión (A/D)
+                      00185                                                                                                         
+                                            ;               If ADON=1
+                      00186                                                                                                         
+                                            ;                                       1=la conversión esta en progreso (ponien
+                      00187                                                                                                         
+                                            ;                                       0=la conversión no esta en progreso (est
+                      00188                                                                                                         
+                                            ;Bit 1  Sin implementar: leído como ‘0’
+                      00189                                                         ;(utilizado en prog princ)                      
+                            ;Bit 0  ADON: bit de encendido del A/D
+                      00190                                                                                                         
+                                            ;                                       1=modulo convertidor A/D esta operando
+                      00191                                                                                                         
+                                            ;                                       0=modulo convertidor esta apagado y no c
+                      00192         
+                      00193                 ;hecho arriba                                                                           
+                                    ;               •       Seleccionar reloj de conversión A/D     (ADCON0)
+                      00194 ;#######################################################################################################
+                            ##############################
+                      00195 ;############################### CONFIGURAR FLANCO DE SUBIDA PARA INTERRUPCION EXTERNA POR PIN RB0 #####
+                            ##########################
+                      00196 
+0035   1683           00197                                                         BSF             STATUS,RP0                      
+                                            ; selecciona banco 1
+0036   1303           00198                                                         BCF             STATUS,RP1                      
+                                            ; selecciona banco 1
+                      00199                 
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0037   1701           00200                                                         BSF             OPTION_REG,6                    
+                                            ; activa por flanco de subida, bit INTEDG
+                      00201 
+                      00202 ;#######################################################################################################
+                            ##############################
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00203 ;################################################# HABILITACION DE INTERRUPCIONES ######################
+                            #####################################################
+                      00204                                                         
+0038   160B           00205                                                         BSF             INTCON, 4                       
+                                            ; que sea interrupcion externa por RB0, bit INTE bit 4
+0039   178B           00206                                                         BSF             INTCON, 7                       
+                                    ; habilitamos interrupcion global GIE bit 7
+                      00207 
+                      00208 ;#######################################################################################################
+                            ####################################
+003A   20BD           00209 SP_INTERRUPT            CALL            guardar_reg_imp 
+                      00210 
+Message[305]: Using default destination of 1 (file).
+003B   0AA4           00211                                         INCF            UNI                     
+                      00212                                         ;---------------------------------------------------------------
+                            ----------------------------------------------------------------------------------
+003C   1103           00213                                         BCF             STATUS,2                ;pone a cero bit Z
+003D   300C           00214                                         MOVLW           B'00001100'                     ;carga registro 
+                            W con 10 decimal
+003E   0224           00215                                         SUBWF           UNI,0                   ;(UNI)-(W)->(W), el resu
+                            ltado lo guarda en W, sin alterar UNI
+003F   1D03           00216                                         BTFSS           STATUS,2                ;verifica si el bit Z es
+                            ta a 1, y salta
+0040   2842           00217                                         GOTO            follow                          
+0041   2045           00218                                         CALL            UNI_A_CERO
+0042   2049           00219 follow                          CALL            despliega_u
+                      00220                                         ;CALL           un_segundo
+0043   2056           00221                                         CALL            BCD_BINARIO
+                      00222 
+0044   20C6           00223                                         CALL            recuperar_reg_imp
+                      00224                         
+                      00225                                         ;RETFIE                                                         
+                            ;regresa de la interrupcion
+                      00226                                         
+                      00227 ;######################################################################################################
+                      00228 ;------------ subrutina que limpia el registro UNI -------------------------------------------
+                      00229 
+0045   01A4           00230 UNI_A_CERO              CLRF            UNI             ;pone a ceros registro UNI, Z es afectado.
+0046   0008           00231                                         RETURN                  ;regresa al flujo del programa          
+                      00232 ;---------------------------------------------------------------------------------------------
+                      00233 
+                      00234 ;------------- subrutina que limpia el registro DECE -----------------------------------------
+                      00235 
+0047   01A5           00236 DECE_A_CERO             CLRF            DECE            ;pone a ceros registro UNI, Z es afectado.
+0048   0008           00237                                         RETURN                          ;regresa al flujo del programa  
+                                    
+                      00238 ;----------------------------------------------------------------------------------------------
+                      00239 
+                      00240 ;*********************************************************************** SUBRUTINA QUE DESPLIEGA LAS UNI
+                            DADES EN DISPLAY 7 SEGMENTOS  ******************************************************************
+0049   1283           00241 despliega_u     BCF             STATUS,RP0
+004A   0824           00242                         MOVF            UNI,0                                   ; mueve el contenido de 
+                            UNI al registro W
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00243                                                                                                 ; RB3,RB
+                            2,RB1,RA6       UNIDADES
+                      00244                                                                                                 ; RB7,RB
+                            6,RB5,RB4       DECENAS
+004B   0086           00245                         MOVWF           PORTB
+004C   1606           00246                         BSF             PORTB,4                         ; poniendo en 1 en el nibble mas
+                             alto, apaga el display de las DECENAS
+004D   1686           00247                         BSF             PORTB,5
+004E   1706           00248                         BSF             PORTB,6
+004F   1786           00249                         BSF             PORTB,7
+0050   1C24           00250                         BTFSS           UNI,0                                   ;salta si hay un '1' en 
+                            el bit0 del registro UNI
+0051   2854           00251                         GOTO            set_cero                                        ; si no, salta y
+                             pon un '0' en el bit6 del puerto A
+0052   1705           00252                         BSF             PORTA,6                         ; si si, pon un '1' en el bit6 d
+                            el puerto A
+0053   2855           00253                         GOTO            termina_u
+0054   1305           00254 set_cero                BCF             PORTA,6
+0055   0008           00255 termina_u       RETURN  
+                      00256 ;---------------------------------------------------------------------------------------------          
+                                                                            
+                      00257 ;--------------- subrutina para convertir de BCD a BINARIO ----------------------------------------
+                      00258 
+0056   0825           00259 BCD_BINARIO     MOVF            DECE,0                          ; mueve el contenido de DECE al registro
+                             W
+0057   00A8           00260                                 MOVWF           dece_comodin            ; mueve W al registro decenas co
+                            modin                                   
+0058   0DA8           00261                                 RLF             dece_comodin,1          ; rota a la izq. el registo dece
+                            _comodin y el resultado ponlo ahi mismo
+0059   0DA8           00262                                 RLF             dece_comodin,1          ; rota a la izq. el registo dece
+                            _comodin y el resultado
+005A   0828           00263                                 MOVF                    dece_comodin,0                  ; mueve dece_com
+                            odin al registro W
+005B   07A5           00264                                 ADDWF           DECE,1                          ; suma W+DECE, el result
+                            ado almacenalo en DECE
+005C   0D25           00265                                 RLF             DECE,0                          ; rota a la izq. el regi
+                            sto, el resultado ponlo en W
+005D   07A4           00266                                 ADDWF           UNI,1                           ; suma W+UNI, el resulta
+                            do almacenalo en W
+005E   00AC           00267                                 MOVWF           BINARIO_SP                              ; mueve W al reg
+                            istro BINARIO
+005F   0008           00268                                 RETURN                                          ; regresa de la Subrutin
+                            a
+                      00269 ;-------------------------------------------------------------------------------------------
+                      00270 ;#############################################################################################
+                      00271 
+                      00272 ;################################# EMPIEZA LA CONVERSION #############################
+0060   1283           00273                         BCF             STATUS, RP0             ; cambio al banco 0
+0061   1303           00274                         BCF             STATUS,RP1              ; cambio a banco 0
+                      00275                         
+0062   141F           00276                         BSF             ADCON0,0                        ;               •       Encienda
+                             el modulo A/D  (ADCON0)        (biit cero)
+                      00277                                                                                         ;2.     Configur
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            ar interrupción A/D (si se desea)
+                      00278                                                                                         ;               
+                            •       Poner a ‘0’ bit ADIF
+                      00279                         ;no deseamos                                    ;               •       Poner a 
+                            ‘1’ bit ADIE
+                      00280                                                                                         ;               
+                            •       Poner a ‘1’ bit PEIE
+                      00281                                                                                         ;               
+                            •       Poner a ‘1’ bit GIE
+0063   206F           00282 REG             CALL            RETRASO                 ;3.     Esperar el tiempo de adquisición requeri
+                            do
+                      00283                                                                                         ;4.     Empezar 
+                            conversión.
+0064   151F           00284                         BSF             ADCON0,2                        ;               •       Poner a 
+                            ‘1’ bit GO/DONE_ (ADCON0)
+0065   191F           00285 ESP             BTFSC           ADCON0,2                        ;5.     Esperar para completar la conver
+                            sión A/D, por cualquiera de los siguientes:
+0066   2865           00286                         GOTO            ESP                             ;               •       Poleando
+                             (modo poleo o de ciclo) para que el bit GO/DONE_ sea puesto a ‘0’ (con interrupción deshabilita
+                      00287                                                                                         ;               
+                            •       Esperando por interrupción de A/D
+                      00288                                                                                         ;6.     Leer el 
+                            registro par que da el resultado de la conversión. (ADRESH:ADRESL); en este caso nos mostrara lo
+                      00289                         
+                      00290                                                                                         ;               
+                            •       Poner a ‘0’ bit ADIF si es requerido.
+                      00291                                                 
+                      00292                                                                                         ;7.     Para la 
+                            siguiente conversión, vaya a los pasos 1 o paso 2 como sea requerido. El tiempo de conversión po
+                      00293                                                                                         ; regresa por ot
+                            ra conversion
+                      00294 
+0067   1283           00295                         BCF             STATUS, RP0             ; cambio al banco 0
+0068   081E           00296                         MOVF            ADRESH,0                        ;mueve el registro ADRESH al reg
+                            istro W
+                      00297                         
+0069   00B5           00298                         MOVWF           BIN_comodin                     ; salva el numero binario en BIN
+                            _comodin
+006A   00B4           00299                         MOVWF           BIN                                     ; salva el numero binari
+                            o en BIN
+006B   208E           00300                         CALL            BIN_BCD         ; llama a la subrutina de conversion de BINARIO 
+                            A BCD
+                      00301                                                                                         ; en el registro
+                             BCDL se encuentran (NIBBLE decenas)(NIBBLE UNIDADES), necesitamos desplegarlo en el display 7 s
+006C   20B4           00302                         CALL            desplegar_bin_bcd                                               
+                                                                            
+                      00303 
+                      00304 
+006D   206F           00305                         CALL            RETRASO
+006E   2863           00306                         GOTO            REG
+                      00307 ;***************************************************************;***************************************
+                            ************************;***************************************************************;*******
+                      00308 ;*************Retraso **************************************************
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00309 
+006F                  00310 RETRASO                 ;MOVLW                  D'3'
+                      00311                                         ;MOVWF          z3
+                      00312                                         ;MOVLW          D'137'
+                      00313                                         ;MOVWF          z2
+                      00314                                         ;DECFSZ         z1,f
+                      00315                                         ;GOTO                   $-1
+                      00316                                         ;DECFSZ         z2,f
+                      00317                                         ;GOTO                   $-3
+                      00318                                         ;DECFSZ         z3,f
+                      00319                                         ;GOTO                   $-5
+006F   0008           00320                                         RETURN
+                      00321 
+                      00322 ;#######################################################################################################
+                            ############################
+                      00323 
+                      00324 
+                      00325 ;***************************************************************
+                      00326 
+0070   3003           00327 retraso500ms            MOVLW                   D'3'
+0071   00A2           00328                                         MOVWF                   z3
+0072   3089           00329                                         MOVLW                   D'137'
+0073   00A1           00330                                         MOVWF                   z2
+0074   0BA0           00331                                         DECFSZ          z1,f
+0075   2874           00332                                         GOTO                    $-1
+0076   0BA1           00333                                         DECFSZ          z2,f
+0077   2874           00334                                         GOTO                    $-3
+0078   0BA2           00335                                         DECFSZ          z3,f
+0079   2874           00336                                         GOTO                    $-5
+007A   0008           00337                                         RETURN
+                      00338         
+                      00339 ;########################################## SUBRUTINA DE UN SEGUNDO DE TIEMPO ##########################
+                            #########################################################################################
+                      00340 
+007B   3004           00341 un_segundo                      MOVLW           H'04'                                   ;mueve 4 al regi
+                            stro contador   
+007C   00AF           00342                                         MOVWF           CONTADOR3                       ;mueve el conten
+                            ido de W a contador3    
+                      00343                                                                 
+007D   30FA           00344                                         MOVLW           H'FA'                                   ;mueve 2
+                            50 al registro contador 
+007E   00AE           00345                                         MOVWF           CONTADOR2                       ;mueve el conten
+                            ido de W a contador2    
+                      00346                                                                 
+007F   30A6           00347                                         MOVLW           H'A6'                                   ;mueve A
+                            6 al registro contador  MOVLW
+0080   00AD           00348                                         MOVWF           CONTADOR1                       ;mueve el conten
+                            ido de W a contador1
+                      00349                                                                 
+0081   0BAF           00350 Has_4                           DECFSZ  CONTADOR3,1                             
+0082   2884           00351                                         GOTO            Has_250                         
+0083   288A           00352                                         GOTO            Sigue                           
+                      00353                                                                 
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0084                  00354 Has_250                                                         
+0084   0BAE           00355                                         DECFSZ  CONTADOR2,1                             
+0085   2887           00356                                         GOTO            Un_ms                           
+0086   2881           00357                                         GOTO            Has_4                           
+                      00358                                                                 
+0087   208B           00359 Un_ms                           CALL            Medio_ms                        ;retraso ½ ms   (2)
+0088   208B           00360                                         CALL            Medio_ms                        ;retraso ½ ms   
+0089   2884           00361                                         GOTO            Has_250                         
+                      00362                                                                 
+008A   0008           00363 Sigue                           RETURN                                          ; SALE DE LA SUBRUTINA D
+                            E 1 SEGUNDO
+                      00364 
+                      00365 ;################################################ SUBRUTINA DE MEDIO MILISEGUNDO #######################
+                            ###########################################################################                     
+                      00366 
+008B                  00367 Medio_ms                                                                
+008B   0BAD           00368 ETIQUETA                        DECFSZ  CONTADOR1,1             ;drecrementa CONTADOR en una unidad,alma
+                            cenalo en el mismo registro     LAZO
+008C   288B           00369                                         GOTO            ETIQUETA                                ;y salta
+                             si es zero.    
+008D   0008           00370                                         RETURN                                          
+                      00371 
+                      00372 ;#######################################################################################################
+                            ############################    
+008E                  00373 BIN_BCD
+008E   01B0           00374                                 clrf                    BCDH
+008F   01B1           00375                                 clrf                    BCDL
+                      00376 
+0090   3008           00377                                 movlw           0x08
+0091   00B3           00378                                 movwf           CUENTA
+                      00379 
+0092                  00380 CONVERSION1
+0092   1003           00381                                 bcf                      STATUS,C
+0093   0DB4           00382                                 rlf                     BIN,f
+0094   0DB1           00383                                 rlf                     BCDL,f
+0095   0BB3           00384                                 decfsz                  CUENTA,f
+0096   2898           00385                                 goto                    $+2
+0097   28A7           00386                                 goto                    TERMINA_CONVERSION
+0098   300F           00387                                 movlw           b'00001111'
+0099   0531           00388                                 andwf                   BCDL,w
+009A   00B2           00389                                 movwf           BCD_TEMP
+009B   3005           00390                                 movlw           0x05
+009C   0232           00391                                 subwf                   BCD_TEMP,w
+009D   1803           00392                                 btfsc                   STATUS,C
+009E   20A8           00393                                 call                    sum3nib_bajo
+009F   30F0           00394                                 movlw           b'11110000'
+00A0   0531           00395                                 andwf                   BCDL,w
+00A1   00B2           00396                                 movwf           BCD_TEMP
+00A2   3050           00397                                 movlw           0x50
+00A3   0232           00398                                 subwf                    BCD_TEMP,w
+00A4   1803           00399                                 btfsc                   STATUS,C
+00A5   20AE           00400                                 call                    sum3nib_alto
+00A6   2892           00401                                 goto                    CONVERSION1
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00402 
+00A7                  00403 TERMINA_CONVERSION
+00A7   0008           00404                                 return
+                      00405                                 
+                      00406                                 ;*******************************
+                      00407                                 ;Subrutina que se encarga de
+                      00408                                 ;sumar 3 al nibble bajo de BCDL
+                      00409                                 ;*******************************
+00A8                  00410 sum3nib_bajo
+00A8   3003           00411                                 movlw           0x03
+00A9   07B1           00412                                 addwf           BCDL,f
+00AA   1C03           00413                                 btfss           STATUS,C
+00AB   0008           00414                                 return
+00AC   0DB0           00415                                 rlf                     BCDH,f
+00AD   0008           00416                                 return
+                      00417                                 
+                      00418                                 ;*******************************
+                      00419                                 ;Subrutina que se encarga de
+                      00420                                 ;sumar 3 al nibble alto de BCDL
+                      00421                                 ;*******************************
+00AE                  00422 sum3nib_alto
+00AE   3030           00423                                 movlw           0x30
+00AF   07B1           00424                                 addwf           BCDL,f
+00B0   1C03           00425                                 btfss           STATUS,C
+00B1   0008           00426                                 return
+00B2   0DB0           00427                                 rlf                     BCDH,f
+00B3   0008           00428                                 return
+                      00429 ;###################################################################
+                      00430 ; movemos el registro BCDL al puerto B y el bit0 del registro BCDL al pin1 del puerto A
+                      00431 
+00B4   1283           00432 desplegar_bin_bcd       BCF             STATUS,RP0      ; cambio a banco 0 donde se encuentran PORTB y P
+                            ORTA
+                      00433 
+00B5   0831           00434                                         MOVF            BCDL,0          ; mueve el reg BCDL al registro 
+                            W
+00B6   0086           00435                                         MOVWF           PORTB           ; mueve el registro W al PORTB
+00B7   1C31           00436                                         BTFSS           BCDL,0          ; salta si hay un '1' en el bit0
+                             del registro BCDL
+00B8   28BB           00437                                         GOTO            pon_cero        ; salta a etiqueta SIGUE
+00B9   1705           00438                                         BSF             PORTA,6 ; pon un '1' en el pin1 del PUERTO A
+00BA   28BC           00439                                         GOTO            termina
+00BB   1305           00440 pon_cero                        BCF             PORTA,6 ; pon un '0' en el pin1 del puerto A            
+                                                    
+00BC   0008           00441 termina                         RETURN                                  
+                      00442                                                                 
+                      00443 ;#################################################################################################
+00BD   00AB           00444 guardar_reg_imp         MOVWF   W_TEMP          ;Copy W to TEMP register                                
+                                                            ;codigo propuesto por hoja de especificaciones
+00BE   0E03           00445                                         SWAPF           STATUS,W                ;Swap status to be saved
+                             into W                                                 ;codigo propuesto por hoja de especifica
+00BF   0183           00446                                         CLRF            STATUS          ;bank 0, regardless of current b
+                            ank, Clears IRP,RP1,RP0 ;codigo propuesto por hoja de especificaciones
+00C0   00A9           00447                                         MOVWF   STATUS_TEMP     ;Save status to bank zero STATUS_TEMP re
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            gister                  ;codigo propuesto por hoja de especificaciones
+00C1   080A           00448                                         MOVF            PCLATH, W               ;Only required if using 
+                            page 1                                                  ;codigo propuesto por hoja de especifica
+00C2   00AA           00449                                         MOVWF   PCLATH_TEMP     ;Save PCLATH into W                     
+                                                                            ;codigo propuesto por hoja de especificaciones
+00C3   018A           00450                                         CLRF            PCLATH          ;Page zero, regardless of curren
+                            t page                                  ;codigo propuesto por hoja de especificaciones
+00C4   1283           00451                                         BCF             STATUS,RP0                                      
+                            ; selecciona banco 0
+00C5   0008           00452                                         RETURN
+                      00453 ;#####################################################################################################  
+                                                            
+                      00454 ; ========== recuperacion de reg import =============
+                      00455                 
+00C6   082A           00456 recuperar_reg_imp                               MOVF            PCLATH_TEMP,W           ;Restore PCLATH 
+                                                                    ;codigo propuesto por hoja de especificaciones
+00C7   008A           00457                                                                 MOVWF   PCLATH                          
+                            ;Move W into PCLATH                                     ;codigo propuesto por hoja de especifica
+00C8   0E29           00458                                                                 SWAPF           STATUS_TEMP,W           
+                            ;Swap STATUS_TEMP register into W       ;codigo propuesto por hoja de especificaciones
+                      00459                                                                                                         
+                                                            ;(sets bank to original state)                                  
+00C9   0083           00460                                                                 MOVWF   STATUS                          
+                            ;Move W into STATUS register                    ;codigo propuesto por hoja de especificaciones
+00CA   0EAB           00461                                                                 SWAPF           W_TEMP,F                
+                                            ;Swap W_TEMP                                            ;codigo propuesto por ho
+00CB   0E2B           00462                                                                 SWAPF           W_TEMP,W                
+                                            ;Swap W_TEMP into W                             ;codigo propuesto por hoja de es
+00CC   0008           00463                                                                 RETURN
+                      00464 ;################################ PARA QUE NO SE PIERDA AQUI ESTA EL FINAL DEL PROGRAMA ################
+                            ################################################################################################
+                      00465                                         END
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+ANSEL                             0000009B
+BANCO0                            BCF     STATUS,5
+BANCO1                            BSF     STATUS,5
+BCDH                              00000030
+BCDL                              00000031
+BCD_BINARIO                       00000056
+BCD_TEMP                          00000032
+BF                                00000000
+BIN                               00000034
+BINARIO_SP                        0000002C
+BIN_BCD                           0000008E
+BIN_comodin                       00000035
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1H                            00000016
+CCPR1L                            00000015
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CONTADOR1                         0000002D
+CONTADOR2                         0000002E
+CONTADOR3                         0000002F
+CONVERSION1                       00000092
+CREN                              00000004
+CSRC                              00000007
+CUENTA                            00000033
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DECE                              00000025
+DECE_A_CERO                       00000047
+D_A                               00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+ESP                               00000065
+ETIQUETA                          0000008B
+F                                 00000001
+FERR                              00000002
+FREE                              00000004
+FSR                               00000004
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+Has_250                           00000084
+Has_4                             00000081
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+INDF                              00000000
+INICIO                            00000005
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IOFS                              00000002
+IRCF0                             00000004
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+IRCF1                             00000005
+IRCF2                             00000006
+IRP                               00000007
+Medio_ms                          0000008B
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OERR                              00000001
+OPTION_REG                        00000081
+OSCCON                            0000008F
+OSCTUNE                           00000090
+OSFIE                             00000007
+OSFIF                             00000007
+OSTS                              00000003
+P                                 00000004
+PCL                               00000002
+PCLATH                            0000000A
+PCLATH_TEMP                       0000002A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+R                                 00000002
+RBIE                              00000003
+RBIF                              00000000
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+READ_WRITE                        00000002
+REG                               00000063
+RETRASO                           0000006F
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+R_W                               00000002
+S                                 00000003
+SCS0                              00000000
+SCS1                              00000001
+SMP                               00000007
+SP                                00000026
+SPBRG                             00000099
+SPEN                              00000007
+SP_INTERRUPT                      0000003A
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+STATUS_TEMP                       00000029
+SWDTE                             00000000
+SWDTEN                            00000000
+SYNC                              00000004
+Sigue                             0000008A
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1RUN                             00000006
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TERMINA_CONVERSION                000000A7
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1CS                            00000001
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISB                             00000086
+TRMT                              00000001
+TUN0                              00000000
+TUN1                              00000001
+TUN2                              00000002
+TUN3                              00000003
+TUN4                              00000004
+TUN5                              00000005
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+UNI                               00000024
+UNI_A_CERO                        00000045
+Un_ms                             00000087
+VCFG0                             00000004
+VCFG1                             00000005
+W                                 00000000
+WCOL                              00000007
+WDTCON                            00000105
+WDTPS0                            00000001
+WDTPS1                            00000002
+WDTPS2                            00000003
+WDTPS3                            00000004
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+W_TEMP                            0000002B
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_CCP1_RB0                         00003FFF
+_CCP1_RB3                         00002FFF
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_CONFIG1                          00002007
+_CONFIG2                          00002008
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_EXTCLK                           00003FEF
+_EXTRC_CLKOUT                     00003FFF
+_EXTRC_IO                         00003FFE
+_FCMEN_OFF                        00003FFE
+_FCMEN_ON                         00003FFF
+_HS_OSC                           00003FEE
+_IESO_OFF                         00003FFD
+_IESO_ON                          00003FFF
+_INTRC_CLKOUT                     00003FFD
+_INTRC_IO                         00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_MCLR_OFF                         00003FDF
+_MCLR_ON                          00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_ENABLE_1024                  00003BFF
+_WRT_ENABLE_512                   00003DFF
+_WRT_ENABLE_OFF                   00003FFF
+_XT_OSC                           00003FED
+__16F88                           00000001
+dece_comodin                      00000028
+desplegar_bin_bcd                 000000B4
+despliega_u                       00000049
+follow                            00000042
+guardar_reg_imp                   000000BD
+pon_cero                          000000BB
+recuperar_reg_imp                 000000C6
+retraso500ms                      00000070
+set_cero                          00000054
+sum3nib_alto                      000000AE
+sum3nib_bajo                      000000A8
+termina                           000000BC
+termina_u                         00000055
+un_segundo                        0000007B
+uni_comodin                       00000027
+z1                                00000020
+z2                                00000021
+z3                                00000022
+z4                                00000023
+MPASM 03.60 Released                         CTRL-DIFUSO4.ASM   6-28-2007  21:15:19         PAGE 20
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+
+0000 : X----XXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+00C0 : XXXXXXXXXXXXX--- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:   201
+Program Memory Words Free:  3895
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :    12 reported,     0 suppressed
+
+

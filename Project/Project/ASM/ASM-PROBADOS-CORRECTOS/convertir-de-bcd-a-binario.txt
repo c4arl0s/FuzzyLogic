@@ -1,0 +1,14 @@
+;--------------- subrutina para convertir de BCD a BINARIO ----------------------------------------
+
+BCD_BINARIO	BANCO0
+				MOVF		DECE,0				; mueve el contenido de DECE al registro W
+				MOVWF		dece_comodin		; mueve W al registro decenas comodin					
+				RLF		dece_comodin,1		; rota a la izq. el registo dece_comodin y el resultado ponlo ahi mismo
+				RLF		dece_comodin,1		; rota a la izq. el registo dece_comodin y el resultado
+				MOVF    		dece_comodin,0  		; mueve dece_comodin al registro W
+				ADDWF		DECE,1				; suma W+DECE, el resultado almacenalo en DECE
+				RLF		DECE,0				; rota a la izq. el registo, el resultado ponlo en W
+				ADDWF		UNI,1				; suma W+UNI, el resultado almacenalo en W
+				MOVWF		BINARIO				; mueve W al registro BINARIO
+				RETURN						; regresa de la Subrutina
+;-------------------------------------------------------------------------------------------

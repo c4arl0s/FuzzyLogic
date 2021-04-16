@@ -1,0 +1,18 @@
+LM35	1500 	mV	a 150°
+	250	mV	a 25°
+
+	2^10= 1024 valores	
+	
+	si la tension de referencia es 1500 mV
+
+	(1500 mV) / 10 mV = 150 grados 
+
+		pero si tengo 1.5 / 1024 = 1.46 [mV] necesito un sensor de 1.46 [mV/°C]
+							     tengo uno de 10.00 [mV/°C]
+
+	¿cual debe ser la tensión de referencia para que obtenga 100 valores ?
+	
+	Vref = 10mV*100
+	Vref = 1 [V]
+
+	

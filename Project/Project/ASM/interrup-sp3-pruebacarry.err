@@ -1,0 +1,37 @@
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 110 : Symbol not previously defined (LEER_TEMP_AMB)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 111 : Symbol not previously defined (DESPLEGAR_TEMP_AMB)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 114 : Symbol not previously defined (LEE_TEMP_ACTUAL)
+Error[108]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 116 : Illegal character (,)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 117 : Symbol not previously defined (ERROR_DE_TEMP1)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 123 : Symbol not previously defined (ALFA)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 124 : Symbol not previously defined (ALFA_A_ENVIAR)
+Warning[202] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 126 : Argument out of range.  Least significant bits used.
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 129 : Symbol not previously defined (BTFSC)
+Message[305] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 134 : Using default destination of 1 (file).
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 137 : Symbol not previously defined (CALC_dT_dt)
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 247 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 248 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 250 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 251 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 252 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 275 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 276 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 278 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 279 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 280 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 296 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 297 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 299 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 300 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 301 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[305] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 442 : Using default destination of 1 (file).
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 468 : Symbol not previously defined (BIN_BCD)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 473 : Symbol not previously defined (TEMP_ACTUAL1)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 474 : Symbol not previously defined (TEMP_OBJETIVO)
+Error[113]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 477 : Symbol not previously defined (ERROR_TEMPi)
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 526 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 527 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 534 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 537 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 543 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Error[116]   D:\MIS DOCUMENTOS\ASM\INTERRUP_SP3_PRUEBACARRY.ASM 596 : Address label duplicated or different in second pass (LEER_TEMP_ACTUAL)

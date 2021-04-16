@@ -1,0 +1,10 @@
+mueve un motor de AC con el 16F88
+incrementa su velocidad gradualmente, hasta su maxima velocidad,
+despues para.
+se hizo como experimento para el programa de logica difusa
+
+entra pulso sincronizado con la linea de AC por RB7
+sale pulso de disparo con retardo variable por RA4
+
+
+ver fotografias anexas

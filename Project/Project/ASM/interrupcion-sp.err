@@ -1,0 +1,19 @@
+Message[305] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 98 : Using default destination of 1 (file).
+Message[305] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 105 : Using default destination of 1 (file).
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 280 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 281 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 287 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 296 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 299 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 308 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 323 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 326 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 329 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 330 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 373 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 382 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 383 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 384 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 385 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 386 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Error[173]   D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM 416 : source file path exceeds 62 characters (D:\MIS DOCUMENTOS\MIS DOCUMENTOS INGENIERIA\TEMAS_ELEC\ASM\INTERRUPCION_SP.ASM)

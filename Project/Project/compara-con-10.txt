@@ -1,0 +1,23 @@
+	BCF	STATUS,2	;pone a cero bit Z
+	MOVLW	B'10101'	;carga registro W con 10 decimal
+	SUBWF	UNI,0		;(UNI)-(W)->(W), el resultado lo guarda en W, sin alterar UNI
+	BTFSS	STATUS,2	;verifica si el bit Z esta a 1, y salta
+	GOTO	SIGUE				
+	GOTO	UNI_A_CERO
+SIGUE	MOVLW	B'0101'		;carga con 5 el registro W
+	MOVWF	SP		;mueve el reg W al registro SP
+	
+
+
+
+
+
+
+
+
+
+
+
+UNI_A_CERO	CLRF	UNI	;pone a ceros registro UNI, Z es afectado.
+		GOTO	SIGUE	;regresa al flujo del programa
+	

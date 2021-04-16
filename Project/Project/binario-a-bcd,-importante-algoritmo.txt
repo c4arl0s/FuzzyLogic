@@ -1,0 +1,106 @@
+
+Binario a BCD - Recorre y Suma+3
+Ayer, 21 de Junio de 2007, 07:00:00 p.m. | micropic
+Numero Binario de 8 bits a BCD mediante el algoritmo Recorre y Suma+3
+
+En la entrada anterior se encuentra una rutina para convertir un numero Binario de 8 bits a BCD empleando un metodo de division po restas sucesivas. En esta ocasion presento una rutina para lograr la misma conversion de Binario a BCD empleando el algoritmo Recorre y Suma+3.
+
+
+El algoritmo funciona de la siguiente manera:
+
+Recorre 1 bit a la izquierda el numero binario.
+Si se han hecho 8 corrimientos, el numero BCD se encuentra en las columnas CENTENAS, DECENAS y UNIDADES.
+Si el valor binario de cualquiera de las columnas BCD es 5 o mayor, se suma 3 al valor en esta columna BCD.
+Si se desea convertir un byte despues de haber efectuado 8 corrimientos la conversion ha finalizado, para 2 bytes se necesitarian 16 y asi sucesivamente.
+Es un metodo muy facil de entender y aplicar. Utilizando este algoritmo la rutina de conversion de un numero binario de 8 bits a BCD es la siguiente:
+
+BIN2BCD_RS3
+        clrf     BCDH
+        clrf     BCDL
+
+        movlw    0x08
+        movwf    CUENTA
+
+CONVERSION1
+        bcf      STATUS,C
+        rlf      BIN,f
+        rlf      BCDL,f
+        decfsz   CUENTA,f
+        goto     $+2
+        goto     TERMINA_CONVERSION
+        movlw    b'00001111'
+        andwf    BCDL,w
+        movwf    BCD_TEMP
+        movlw    0x05
+        subwf    BCD_TEMP,w
+        btfsc    STATUS,C
+        call     SUMA0x03
+        movlw    b'11110000'
+        andwf    BCDL,w
+        movwf    BCD_TEMP
+        movlw    0x50
+        subwf    BCD_TEMP,w
+        btfsc    STATUS,C
+        call     SUMA0x30
+        goto     CONVERSION1
+
+TERMINA_CONVERSION
+        return Al igual que la rutina anterior, antes de llamar a esta rutina de conversion es necesario tener almacenado el numero que se desea convertir en la variable BIN. Al finalizar la rutina el numero BCD estara almacenado en las variables BCDH y BCDL. El nibble bajo de BCDH tendra almacenadas las CENTENAS, el nibble alto de BCDL las DECENAS y el nibble bajo de BCDL las UNIDADES.
+
+De nuevo hay que tener en cuenta que al realizar la conversion el numero que se tenia en un principio en la variable BIN es destruido, asi que se debe tener un respaldo de su valor en otro registro si se desea seguir trabajando con el.
+
+Las rutinas SUMA0x03 Y SUMA0x30 simplemente se encargan de sumar 3 a la columna BCD que lo necesite. Estas rutinas se encuentran en el codigo de la rutina.
+
+Descargar codigo: Conversion numero Binario de 8 bits a BCD - Recorre y Suma+3
+
+
+Conversion Binario a BCD - Convertir un numero de 8 bits
+Ayer, 21 de Junio de 2007, 07:00:00 p.m. | micropic
+Convertir un numero Binario de 8 bits a BCD
+
+El Codigo binario decimal (BCD) es un codigo para numeros decimales en el que cada digito es representado por su propia secuencia binaria. Su principal ventaja es que permite una conversion facil a digitos decimales para su despliegue y permite tambien realizar calculos decimales mas rapidos.
+
+Aqui se presenta una rutina para convertir un numero binario de 8 bits (1 byte) a su equivalente BCD. El valor maximo de un byte es 0xFF = 255, asi que al convertir un numero binario de 8 bits se obtienen 3 digitos BCD.
+
+Esta rutina convierte el numero binario a su equivalente BCD empaquetado. El resultado de la conversion del numero binario a BCD ocupa un byte y medio y se representa en las variables de memoria BCDH y BCDL. El numero binario a convertir debe estar almacenado en la variable BIN.
+
+ej. 0xFF = 255
+ BIN -> BCDH:BCDL
+  FF     02   55La conversion se hace realizando divisiones mediante restas sucesivas. Primero entre 100 para obtener el nibble bajo de BCDH y despues entre 10 para obtener el nibble alto de BCDL y el residuo pasa a formar el nibble bajo de BCDL.
+
+El codigo de la rutina es el siguiente:
+
+BIN8_BCD3
+        clrf    BCDH
+        clrf    BCDL
+BCD_HIGH
+        movlw   .100
+        subwf   BIN,f
+        btfss   STATUS,C
+        goto    SUMA_100
+        incf    BCDH,f
+        goto    BCD_HIGH
+SUMA_100
+        movlw   .100
+        addwf   BIN,f
+        movlw   0x0F
+        movwf   BCDL
+BCD_LOW movlw   .10
+        subwf   BIN,f
+        btfss   STATUS,C
+        goto    SUMA_10
+        incf    BCDL
+        movlw   0x0F
+        iorwf   BCDL
+        goto    BCD_LOW
+SUMA_10 movlw   .10
+        addwf   BIN,f
+        movlw   0xF0
+        andwf   BCDL,f
+        movf    BIN,w
+        iorwf   BCDL,f        returnAntes de llamar a la rutina de conversion es necesario tener almacenado el numero que se desea convertir en la variable BIN. Al finalizar la rutina el numero BCD estara almacenado en las variables BCDH y BCDL. BCDH tendra el numero BCD mas significativo mientras que en BCDL se encontraran los dos numeros restantes, siendo el nibble alto de BCDL el mas significativo de los dos y el nibble bajo de BCDL el menos significativo.
+
+De este modo se logra convertir un numero binario de 8 bits a su equivalente BCD. Solamente hay que tener en cuenta que al realizar la conversion el numero que se tenia en un principio en la variable BIN es destruido, asi que se debe tener un respaldo de su valor en otro registro si se desea seguir trabajando con el.
+
+Descargar codigo: Conversion numero Binario de 8 bits a BCD
+
